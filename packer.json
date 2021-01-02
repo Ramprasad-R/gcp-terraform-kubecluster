@@ -1,0 +1,20 @@
+{
+  "builders": [
+    {
+      "type": "googlecompute",
+      "account_file": "kubenetes-300211-0e972be54a71.json",
+      "project_id": "kubenetes-300211",
+      "zone": "us-west1-a",
+      "source_image_family": "ubuntu-1804-lts",
+      "ssh_username": "ubuntu",
+      "image_name": "kube-master-{{timestamp}}",
+      "machine_type": "e2-standard-4"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "./scripts/kubeinstall.sh"
+    }
+  ]
+}

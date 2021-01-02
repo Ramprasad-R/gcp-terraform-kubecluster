@@ -1,12 +1,12 @@
 resource "google_compute_instance" "kube-master" {
   name         = "kube-master"
-  machine_type = "n1-standard-2"
+  machine_type = "e2-standard-4"
   tags         = ["kube-master"]
   # count = "1"
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-1804-bionic-v20201211a"
+      image = var.GOOGLE_IMAGE
     }
   }
 
@@ -19,48 +19,40 @@ resource "google_compute_instance" "kube-master" {
     }
   }
 
-  #   provisioner "remote-exec" {
-  #     connection {
-  #       type        = "ssh"
-  #       user        = "Techlivz"
-  #       timeout     = "500s"
-  #       private_key = file("gcpkey")
-  #           agent           = "false"
-  #     }
+  provisioner "file" {
+    connection {
+      type = "ssh"
+      user = "ubuntu"
+      # timeout     = "500s"
+      private_key = file("gcpkey")
+      # agent       = "false"
+      host = self.network_interface[0].access_config[0].nat_ip
+    }
+    source      = "./scripts/kubeinstall.sh"
+    destination = "/tmp/kubeinstall.sh"
+  }
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      timeout     = "500s"
+      private_key = file("gcpkey")
+      agent       = "false"
+      host        = self.network_interface[0].access_config[0].nat_ip
+    }
+    inline = [
+      "chmod +x /tmp/kubeinstall.sh",
+      "sh /tmp/kubeinstall.sh"
+    ]
+  }
 
-  #     inline = [
-  #       "touch /tmp/temp.txt",
-  #     ]
-  #   }
 
-  #   provisioner "file" {
-  #       connection {
-  #       type        = "ssh"
-  #       user        = "Techlivz"
-  #       timeout     = "500s"
-  #       private_key = file("gcpkey")
-  #           agent           = "false"
-  #     }
-  #     source      = "./scripts"
-  #     destination = "/tmp/"
-  #   }
-  #   provisioner "remote-exec" {
-  #       connection {
-  #       type        = "ssh"
-  #       user        = "Techlivz"
-  #       timeout     = "500s"
-  #       private_key = file("gcpkey")
-  #           agent           = "false"
-  #     }
-  #     inline = [
-  #       "chmod +x /tmp/scripts/*.sh",
-  #       "sudo sh /tmp/scripts/docker_install.sh",
-  #       "sudo sh /tmp/scripts/kubeadm.sh"
-  #       ]
-  #   }
+  # provisioner "local-exec" {
+  #   command = "gcloud compute scp kube-master:/tmp/temp.txt ."
+  # }
 
   metadata = {
-    sshKeys = "Techlivz:${file(var.ssh_public_key_filepath)}"
+    sshKeys = "ubuntu:${file(var.ssh_public_key_filepath)}"
   }
 
 }

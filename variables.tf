@@ -7,3 +7,7 @@ variable "ssh_public_key_filepath" {
 variable "worker_count" {
   default = 3
 }
+
+variable "GOOGLE_IMAGE" {
+  default = "ubuntu-1804-bionic-v20201211a"
+}

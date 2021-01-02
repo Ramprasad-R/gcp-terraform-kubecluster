@@ -1,7 +1,7 @@
 resource "google_compute_instance" "kube-worker" {
-  name         = "kube-worker-${count.index}"
+  name         = "kube-worker-${count.index + 1}"
   machine_type = "n1-standard-2"
-  tags         = ["kube-worker-${count.index}"]
+  tags         = ["kube-worker-${count.index + 1}"]
   count        = var.worker_count
 
   boot_disk {
@@ -19,48 +19,40 @@ resource "google_compute_instance" "kube-worker" {
     }
   }
 
-  #   provisioner "remote-exec" {
-  #     connection {
-  #       type        = "ssh"
-  #       user        = "Techlivz"
-  #       timeout     = "500s"
-  #       private_key = file("gcpkey")
-  #           agent           = "false"
-  #     }
 
-  #     inline = [
-  #       "touch /tmp/temp.txt",
-  #     ]
-  #   }
+  provisioner "file" {
+    connection {
+      type = "ssh"
+      user = "ubuntu"
+      # timeout     = "500s"
+      private_key = file("gcpkey")
+      # agent       = "false"
+      host = self.network_interface[0].access_config[0].nat_ip
+    }
+    source      = "./scripts/kubeworker.sh"
+    destination = "/tmp/kubeworker.sh"
+  }
+  provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      timeout     = "500s"
+      private_key = file("gcpkey")
+      agent       = "false"
+      host        = self.network_interface[0].access_config[0].nat_ip
+    }
+    inline = [
+      "chmod +x /tmp/kubeworker.sh",
+      "sh /tmp/kubeworker.sh"
+    ]
+  }
 
-  #   provisioner "file" {
-  #       connection {
-  #       type        = "ssh"
-  #       user        = "Techlivz"
-  #       timeout     = "500s"
-  #       private_key = file("gcpkey")
-  #           agent           = "false"
-  #     }
-  #     source      = "./scripts"
-  #     destination = "/tmp/"
-  #   }
-  #   provisioner "remote-exec" {
-  #       connection {
-  #       type        = "ssh"
-  #       user        = "Techlivz"
-  #       timeout     = "500s"
-  #       private_key = file("gcpkey")
-  #           agent           = "false"
-  #     }
-  #     inline = [
-  #       "chmod +x /tmp/scripts/*.sh",
-  #       "sudo sh /tmp/scripts/docker_install.sh",
-  #       "sudo sh /tmp/scripts/kubeadm.sh"
-  #       ]
-  #   }
+
 
   metadata = {
-    sshKeys = "Techlivz:${file(var.ssh_public_key_filepath)}"
+    sshKeys = "ubuntu:${file(var.ssh_public_key_filepath)}"
   }
+
+
 
 }
