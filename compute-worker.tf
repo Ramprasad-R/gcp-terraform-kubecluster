@@ -47,7 +47,7 @@ resource "google_compute_instance" "kube-worker" {
     ]
   }
 
-
+  depends_on = ["google_compute_firewall.firewall-externalssh"]
 
   metadata = {
     sshKeys = "ubuntu:${file(var.ssh_public_key_filepath)}"

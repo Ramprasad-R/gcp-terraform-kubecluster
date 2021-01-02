@@ -14,6 +14,6 @@ for i in `cat worker_node.yaml`
 do
 	ssh -i gcpkey ubuntu@$i -o StrictHostKeyChecking=no sudo 'bash -s' < join_kube.sh
 done
-rm -f join_kube.sh
+rm -f join_kube.sh master_node.yaml worker_node.yaml
 
 ssh -i gcpkey ubuntu@$MASTER_IP -o StrictHostKeyChecking=no kubectl get nodes

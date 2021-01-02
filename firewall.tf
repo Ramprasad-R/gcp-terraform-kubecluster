@@ -1,5 +1,5 @@
-resource "google_compute_firewall" "shi-rvs-firewall-externalssh" {
-  name    = "shi-rvs-firewall-externalssh"
+resource "google_compute_firewall" "firewall-externalssh" {
+  name    = "firewall-externalssh"
   network = "default"
 
   allow {
