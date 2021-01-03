@@ -51,7 +51,6 @@ resource "google_compute_instance" "kube-master" {
   #   command = "gcloud compute scp kube-master:/tmp/temp.txt ."
   # }
 
-  depends_on = ["google_compute_firewall.firewall-externalssh"]
 
   metadata = {
     sshKeys = "ubuntu:${file(var.ssh_public_key_filepath)}"

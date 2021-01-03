@@ -8,5 +8,5 @@ resource "google_compute_firewall" "firewall-externalssh" {
   }
 
   source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["externalssh"]
+  target_tags   = ["kube-master", "kube-worker"]
 }

@@ -1,7 +1,7 @@
 resource "google_compute_instance" "kube-worker" {
   name         = "kube-worker-${count.index + 1}"
   machine_type = "n1-standard-2"
-  tags         = ["kube-worker-${count.index + 1}"]
+  tags         = ["kube-worker"]
   count        = var.worker_count
 
   boot_disk {
@@ -47,7 +47,6 @@ resource "google_compute_instance" "kube-worker" {
     ]
   }
 
-  depends_on = ["google_compute_firewall.firewall-externalssh"]
 
   metadata = {
     sshKeys = "ubuntu:${file(var.ssh_public_key_filepath)}"
