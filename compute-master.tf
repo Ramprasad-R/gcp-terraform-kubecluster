@@ -21,12 +21,12 @@ resource "google_compute_instance" "kube-master" {
 
   provisioner "file" {
     connection {
-      type = "ssh"
-      user = "ubuntu"
-      # timeout     = "500s"
+      type        = "ssh"
+      user        = "ubuntu"
+      timeout     = "500s"
       private_key = file("gcpkey")
-      # agent       = "false"
-      host = self.network_interface[0].access_config[0].nat_ip
+      agent       = "false"
+      host        = self.network_interface[0].access_config[0].nat_ip
     }
     source      = "./scripts/kubeinstall.sh"
     destination = "/tmp/kubeinstall.sh"
@@ -46,11 +46,9 @@ resource "google_compute_instance" "kube-master" {
     ]
   }
 
-
   # provisioner "local-exec" {
-  #   command = "gcloud compute scp kube-master:/tmp/temp.txt ."
+  #   command = "echo ${self.network_interface[0].access_config[0].nat_ip} >> master-ip"
   # }
-
 
   metadata = {
     sshKeys = "ubuntu:${file(var.ssh_public_key_filepath)}"

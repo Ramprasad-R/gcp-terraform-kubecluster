@@ -22,12 +22,12 @@ resource "google_compute_instance" "kube-worker" {
 
   provisioner "file" {
     connection {
-      type = "ssh"
-      user = "ubuntu"
-      # timeout     = "500s"
+      type        = "ssh"
+      user        = "ubuntu"
+      timeout     = "500s"
       private_key = file("gcpkey")
-      # agent       = "false"
-      host = self.network_interface[0].access_config[0].nat_ip
+      agent       = "false"
+      host        = self.network_interface[0].access_config[0].nat_ip
     }
     source      = "./scripts/kubeworker.sh"
     destination = "/tmp/kubeworker.sh"
@@ -47,6 +47,9 @@ resource "google_compute_instance" "kube-worker" {
     ]
   }
 
+  # provisioner "local-exec" {
+  #   command = "echo ${self.network_interface[0].access_config[0].nat_ip} >> worker-ip"
+  # }
 
   metadata = {
     sshKeys = "ubuntu:${file(var.ssh_public_key_filepath)}"
